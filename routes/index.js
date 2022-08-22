@@ -20,4 +20,33 @@ router.get('/', function(req, res, next) {
   
 });
 
+router.get('/contacts', function(req, res, next){
+
+  res.render('contacts',{
+    title: 'contato - Restaurante Saboroso!',
+  })
+
+})
+router.get('/menus', function(req, res, next){
+
+  res.render('menus', {
+    title: 'Restaurante Saboroso!',
+  })
+
+})
+router.get('/reservations', function(req, res, next){
+
+  res.render('reservations', {
+    title: 'Restaurante Saboroso!',
+  })
+
+})
+router.get('/services', function(req, res, next){
+
+  res.render('services', {
+    title: 'Restaurante Saboroso!',
+  })
+
+})
+
 module.exports = router;
