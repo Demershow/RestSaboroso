@@ -41,5 +41,5 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 app.listen(3444, function(){
-  console.log('teste')
+  console.log('Servidor Rodando!')
 })
