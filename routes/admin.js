@@ -70,7 +70,7 @@ router.post('/login', function(req, res, nex){
     }
 
 })
-router.get('/contacts', function(req, res, nex){
+router.get('/contacts', function(req, res, next){
 
     res.render('admin/contacts', admin.getParams(req))
 
