@@ -1,18 +1,15 @@
-var conn = require("./db")
+var conn = require("./db");
 
 module.exports = {
-
     render(req, res, error){
-
-        res.render('admin/login', {
-            body:req.body,
+        res.render("admin/login", {
+            body: req.body,
             error
-        })
-
+        });
     },
 
     login(email, password){
-        return new Promise((reject, resolve)=>{
+        return new Promise((resolve, reject)=>{
             conn.query(`
                 SELECT * FROM tb_users WHERE email = ?
             `, [
@@ -21,23 +18,22 @@ module.exports = {
                 if(err){
                     reject(err);
                 }else{
-
-                    if(!results.length > 0){
-                        reject('Usuario ou senha Incrorretos.')
+                    if (!results.length > 0){
+                        reject('Usuário ou senha incorretos.');
                     }else{
-                        let row = results[0] 
+
+                        let row = results[0];
+
                         if(row.password !== password){
-                            reject('Usuario ou senha incorretos.')
-                        } else{
+                           reject('Usuário ou senha incorretos.');
+                        } else {
                             resolve(row);
                         }
+
                     }
 
-                    
                 }
-            })
-        })
+            });
+        });
     }
-
-
 }
