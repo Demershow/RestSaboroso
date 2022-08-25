@@ -52,8 +52,10 @@
               <td><%= row.price %></td>
               <td>
                 <button type="button" class="btn btn-xs btn-info btn-update">
-                  <i class="fa fa-pencil"></i> Editar</button>&nbsp;
-                  <button type="button" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash"></i> Excluir
+                  <i class="fa fa-pencil"></i> Editar</button
+                >&nbsp;
+                <button type="button" class="btn btn-xs btn-danger btn-delete">
+                  <i class="fa fa-trash"></i> Excluir
                 </button>
               </td>
             </tr>
@@ -218,79 +220,33 @@
 <%- include("inc/footer") -%>
 <script src="/js/hcode-file-reader.js"></script>
 <script src="/js/hcode-formsave.js"></script>
+<script src="/js/hcode-grid.js"></script>
 
 <script>
   new HcodeFileReader("#modal-create [type=file]", "#modal-create img");
   new HcodeFileReader("#modal-update [type=file]", "#modal-update img");
+  new HcodeGrid({
 
-  let formCreate = document.querySelector("#modal-create form");
+    deleteUrl: "/admin/menus/${data.id}",
+    deleteMsg: "Deseja realmente excluir o prato ${data.title}?",
+    onUpdateLoad: (formUpdate, name, data) =>{
 
-  formCreate
-    .save()
-    .then((json) => {
-      window.location.reload();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  let formUpdate = document.querySelector("#modal-update form");
-  formUpdate
-    .save()
-    .then((json) => {
-      window.location.reload();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+      let input = formUpdate.querySelector(`[name=${name}]`);
 
-  [...document.querySelectorAll('.btn-delete')].forEach(btn=>{
+            switch (name){
 
-    btn.addEventListener('click', e=>{
+              case "photo":
+                formUpdate.querySelector("img").src = "/" + data[name];
+    
+                break;
 
-      let tr = e.path.find(el =>{
-        return (el.tagName.toUpperCase() === 'TR');
+              default:
+                
+             if(input) input.value = data[name];
 
-      });
-      
-      let data = JSON.parse(tr.dataset.row);
-
-      if (confirm(`Deseja realmente excluir o prato ${data.title}?`)){
-
-        fetch(`/admin/menus/${data.id}`, {
-        method: 'DELETE'
-      })
-
-      .then(response => response.json())
-      .then(json => {
-        window.location.reload();
-      });
+            }
 
     }
-    });
   });
 
-  [...document.querySelectorAll(".btn-update")].forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      let tr = e.path.find((el) => {
-        return el.tagName.toUpperCase() === "TR";
-      });
-
-      let data = JSON.parse(tr.dataset.row);
-
-      for (let name in data) {
-
-        switch (name) {
-          
-          case "photo":
-            formUpdate.querySelector("img").src = "/" + data[name];
-
-            break;
-          default:
-            let input = formUpdate.querySelector(`[name=${name}]`);
-            if (input) input.value = data[name];
-        }
-      }
-      $("#modal-update").modal("show");
-    });
-  });
 </script>

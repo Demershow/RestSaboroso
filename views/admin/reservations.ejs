@@ -85,10 +85,7 @@
               <td><%= moment(row.date).format ('DD [de] MMMM [de] YYYY')%></td>
               <td><%= row.time%></td>
               <td>
-                <button
-                  type="button"
-                  class="btn btn-xs btn-info btn-update"
-                >
+                <button type="button" class="btn btn-xs btn-info btn-update">
                   <i class="fa fa-pencil"></i> Editar</button
                 >&nbsp;<button
                   type="button"
@@ -289,13 +286,21 @@
 <script src="/js/hcode-formsave.js"></script>
 <script src="/js/hcode-grid.js"></script>
 <script>
+  new HcodeGrid({
+    deleteUrl: "/admin/reservations/${data.id}",
+    deleteMsg: "Realmente deseja escluir a reserva de ${data.name}?",
+    onUpdateLoad: (formUpdate, name, data) => {
+      let input = formUpdate.querySelector(`[name=${name}]`);
 
-new HcodeGrid({
+      switch (name) {
+        case "date":
+          if (input) input.value = moment(data[name]).format("YYYY-MM-DD");
 
-    deleteUrl: '/admin/reservations/${data.id}',
-    deleteMsg: 'Realmente deseja escluir a reserva de ${data.name}?',
+          break;
 
-  })
-
-
+        default:
+          if (input) input.value = data[name];
+      }
+    },
+  });
 </script>
