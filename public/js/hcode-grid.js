@@ -1,95 +1,158 @@
 class HcodeGrid {
-  constructor(configs) {
-    this.options = Object.assign(
-      {},
-      {
-        formCreate: "#modal-create form",
-        formUpdate: "#modal-update form",
-        btnUpdate: ".btn-update",
-        btnDelete: ".btn-delete",
-      },
-      configs
-    );
+    constructor(configs){
+        configs.listeners = Object.assign({
+          afterUpdateClick:(e)=>{
 
-    this.initForms();
-    this.initButtons();
-  }
+            $('#modal-update').modal('show');
 
-  initForms() {
-    this.formCreate = document.querySelector(this.options.formCreate);
+          },
+          afterDeleteClick: (e)=>{ 
 
-    this.formCreate
-      .save()
-      .then((json) => {
-        window.location.reload();
-      })
-      .catch((err) => {
+            window.location.reload();
+
+          },
+          afterFormCreate: (e)=>{
+            
+              window.location.reload();
+
+          },
+          afterFormUpdate: (e)=>{
+            
+            window.location.reload();
+
+        }, 
+        afterFormCreateError: (e)=>{
+            
+            alert('Não foi possível enviar este formulario')
+
+        },
+        afterFormUpdateError: (e)=>{
+            
+            alert('Não foi possível atualizar este formulario')
+
+        },
+        
+      }, configs.listeners);
+
+        this.options = Object.assign({}, {
+        formCreate: '#modal-create form',
+        formUpdate: '#modal-update form',
+        btnUpdate: '.btn-update',
+        btnDelete: '.btn-delete',
+        }, configs);
+
+        this.initForms();
+        this.initButtons();
+    }
+
+    initForms(){
+      this.formCreate = document.querySelector(this.options.formCreate);
+      
+      this.formCreate.save().then(json=>{
+
+        this.fireEvent('afterFormCreate')
+
+      }).catch(err =>{
+
+        this.fireEvent('afterFormCreateError')
         console.log(err);
+
       });
 
-    this.formUpdate = document.querySelector(this.options.formUpdate);
 
-    this.formUpdate
-      .save()
-      .then((json) => {
-        window.location.reload();
-      })
-      .catch((err) => {
+      this.formUpdate = document.querySelector(this.options.formUpdate);
+
+      this.formUpdate.save().then(json=>{
+
+        this.fireEvent('afterFormUpdate');
+
+      }).catch(err =>{
+        this.fireEvent('afterFormeUpdateError')
         console.log(err);
+        
       });
-  }
+    }
 
-  initButtons() {
-    [...document.querySelectorAll(this.options.btnUpdate)].forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        let tr = e.path.find((el) => {
-          return el.tagName.toUpperCase() === "TR";
-        });
+    fireEvent(name, args){
 
-        let data = JSON.parse(tr.dataset.row);
+     if (typeof this.options.listeners[name] === 'function') this.options.listeners[name].apply(this, args);
 
-        for (let name in data) {
-          let input = this.formUpdate.querySelector(`[name=${name}]`);
+    }
 
-          switch (name) {
-            case "date":
-              if (input) input.value = moment(data[name]).format("YYYY-MM-DD");
+    getTrData(e){
+        let tr = e.path.find(el =>{
+
+            return (el.tagName.toUpperCase() === 'TR');
+            
+          });
+
+          return JSON.parse(tr.dataset.row);
+    }
+
+    initButtons(){
+        
+
+      [...document.querySelectorAll(this.options.btnUpdate)].forEach(btn =>{
+        btn.addEventListener('click', e =>{
+
+          this.fireEvent('beforeUpdateClick', [e]);
+
+            let data = this.getTrData(e);
+
+          for (let name in data){
+
+            let input = this.formUpdate.querySelector(`[name=${name}]`);
+
+            switch (name){
+
+              case 'date':
+              if(input) input.value = moment(data[name]).format('YYYY-MM-DD');
+
               break;
 
-            default:
-              if (input) input.value = data[name];
+              default:
+                
+             if(input) input.value = data[name];
+
+            }
+
+
           }
-        }
 
-        $("#modal-update").modal("show");
-      });
-    });
 
-    [...document.querySelectorAll(this.options.btnDelete)].forEach((btn) => {
-
-      btn.addEventListener("click", (e) => {
-
-        let tr = e.path.find((el) => {
-
-          return el.tagName.toUpperCase() === "TR";
+          this.fireEvent('afterUpdateClick', [e]);
 
         });
 
-
-        let data = JSON.parse(tr.dataset.row);
-
-        if (confirm(eval("`" + this.options.deleteMsg + "`"))) {
-
-          fetch(eval("`" + this.options.deleteUrl + "`"), {
-            method: "DELETE",
-            
-          })
-            .then((response) => response.json())
-            .then((json) => {
-              window.location.reload();
-            });
-        }
       });
-    });
-  }
+
+      [...document.querySelectorAll(this.options.btnDelete)].forEach(btn=>{
+
+        btn.addEventListener('click', e=>{
+            
+            this.fireEvent('beforeDeleteClick');
+
+            let data = this.getTrData(e);
+
+
+          if (confirm(eval('`' + this.options.deleteMsg + '`'))) {
+            
+            fetch(eval('`' + this.options.deleteUrl + '`'), {
+            method: 'DELETE'
+          })
+
+          .then(response => response.json())
+          .then(json => {
+
+            this.fireEvent('afterDeleteClick');
+
+          });
+          
+        }
+
+        });
+
+      });
+
+    }
 }
