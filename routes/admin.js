@@ -5,7 +5,9 @@ var users = require('./../inc/users')
 var menus = require('./../inc/menus');
 var reservations = require('../inc/reservations');
 var moment = require('moment');
-const contacts = require('../inc/contacts');
+var contacts = require('../inc/contacts');
+var email = require('../inc/email');
+const { getEmails } = require('../inc/email');
 
 moment.locale('pt-BR')
 
@@ -95,9 +97,29 @@ router.delete('/contacts/:id', function(req, res, next){
 
    
 })
-router.get('/emails', function(req, res, nex){
+router.delete('/emails/:id', function(req, res, next){
+    
+    email.delete(req.params.id).then(results=>{
+        res.send(results)
+    }).catch(err=>{
+        res.send(err)
+    })
 
-    res.render('admin/emails', admin.getParams(req))
+   
+})
+
+
+
+router.get('/emails', function(req, res, next){
+
+    email.getEmails().then(data=>{
+        res.render('admin/emails', admin.getParams(req,{
+            data
+        }))
+    })
+
+
+    
 
 })
 router.get('/menus', function(req, res, nex){
