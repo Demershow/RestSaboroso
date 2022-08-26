@@ -7,7 +7,7 @@ var reservations = require('../inc/reservations');
 var moment = require('moment');
 var contacts = require('../inc/contacts');
 var email = require('../inc/email');
-const { getEmails } = require('../inc/email');
+
 
 moment.locale('pt-BR')
 
@@ -157,7 +157,7 @@ router.delete('/menus/:id', function (req, res, next){
 
 router.get('/reservations', function(req, res, next){
 
-    reservations.getReservations().then(data=>{
+    reservations.   getReservations().then(data=>{
         res.render('admin/reservations', admin.getParams(req, {
             date:{},
             data,
