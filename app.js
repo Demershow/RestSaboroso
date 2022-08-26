@@ -19,8 +19,6 @@ var connectRedis = require("connect-redis");
 
 var RedisStore = connectRedis(session);
 
-var indexRouter = require("./routes/index");
-var adminRouter = require("./routes/admin");
 
 var app = express();
 
@@ -29,11 +27,20 @@ var http = http.Server(app);
 var io = socket(http);
 
 io.on('connection', function(socket){
-  console.log('conectado!')
+  console.log('conectado!');
+
+  io.emit("reservations update", {
+    date: new Date()
+  })
 })
+
+var indexRouter = require("./routes/index")(io);
+var adminRouter = require("./routes/admin")(io);
+
 
 app.use(function (req, res, next) {
 
+  req.body={}
   if (req.method === "POST") {
     var form = formidable.IncomingForm({
       uploadDir: path.join(__dirname, "/public/images"),
