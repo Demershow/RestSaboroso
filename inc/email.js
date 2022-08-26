@@ -36,23 +36,23 @@ module.exports = {
     },
     
     save(req){
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject)=>{
             if(!req.fields.email){
-                reject("Email no valid!")
-              } else {
+                reject("Preencha o e-mail.");
+
+              }else{
                 conn.query(`
-                  INSERT INTO tb_emails (email) VALUES(?)
+                INSERT INTO tb_emails (email) VALUES(?)
                 `, [
-                  req.fields.email,
+                  req.fields.email
                 ], (err, results)=>{
                   if(err){
-                    reject(err.messsage);
-                  }else {
-                    resolve(results)
+                    reject(err.message);
+                  }else{
+                    resolve(results);
                   }
-                });
+                })
               }
-
         })
     }
 
